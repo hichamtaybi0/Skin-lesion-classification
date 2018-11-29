@@ -9,9 +9,9 @@ import h5py
 import glob
 import pandas as pd
 
-# fixed-sizes for image, in our case
+# fixed-sizes for image in this case
 # if images are in different size
-#fixed_size = tuple((120, 80))
+# fixed_size = tuple((120, 80))
 
 # path to training data
 train_path = "data/ISIC-2017_Training_Data"
@@ -54,20 +54,14 @@ def fd_histogram(image, mask=None):
     # return the histogram
     return hist.flatten()
 
-# get the training labels
-#train_labels = os.listdir(train_path)
 
-# sort the training labels
-#train_labels.sort()
-
-# empty lists to hold feature vectors and labels
+# empty lists to hold feature vectors
 train_features = []
 
 #####################################
-#extract features for train data
+# extract features for X_train
 #####################################
-
-# loop over the training data sub-folders
+# loop over the training data
 dir = os.path.join(train_path, "")
 for file in glob.glob(os.path.join(dir, '*.jpg')):
 
@@ -80,25 +74,9 @@ for file in glob.glob(os.path.join(dir, '*.jpg')):
     fv_haralick = fd_haralick(image)
     fv_histogram = fd_histogram(image)
 
-    '''
-    df = pd.read_csv(train_path + "/ISIC-2017_Training_Data_Metadata.csv")
-    image_name = os.path.basename(file)
-    age = df[df['image_id'] == image_name].iloc[:, 1:2]
-    sex = df[df['image_id'] == image_name].iloc[:, 2:3]
-    '''
     # Concatenate global features
     global_feature = np.hstack([fv_histogram, fv_haralick, fv_hu_moments])
-    '''
-    df = pd.read_csv("data/ISIC-2017_Training_Part3_GroundTruth.csv")
-    image_name = os.path.basename(file)
-    image_name = os.path.splitext(image_name)[0]
-    current_label = df[df['image_id'] == image_name].iloc[:, 1:2]
-    
-    # update the list of labels and feature vectors
-    labels.append(current_label)
-    '''
     train_features.append(global_feature)
-
 
 # normalize the feature vector in the range (0-1)
 scaler = MinMaxScaler(feature_range=(0, 1))
@@ -119,7 +97,7 @@ y_train.close()
 
 
 #####################################
-#extract features for validation data
+# extract features for X_test
 #####################################
 
 # empty lists to hold feature vectors and labels
@@ -137,23 +115,8 @@ for file in glob.glob(os.path.join(dir, '*.jpg')):
     fv_haralick = fd_haralick(image)
     fv_histogram = fd_histogram(image)
 
-    '''
-    df = pd.read_csv(train_path + "/ISIC-2017_Training_Data_Metadata.csv")
-    image_name = os.path.basename(file)
-    age = df[df['image_id'] == image_name].iloc[:, 1:2]
-    sex = df[df['image_id'] == image_name].iloc[:, 2:3]
-    '''
     # Concatenate global features
     global_feature = np.hstack([fv_histogram, fv_haralick, fv_hu_moments])
-    '''
-    df = pd.read_csv("data/ISIC-2017_Training_Part3_GroundTruth.csv")
-    image_name = os.path.basename(file)
-    image_name = os.path.splitext(image_name)[0]
-    current_label = df[df['image_id'] == image_name].iloc[:, 1:2]
-
-    # update the list of labels and feature vectors
-    labels.append(current_label)
-    '''
     validation_features.append(global_feature)
 
 # normalize the feature vector in the range (0-1)
